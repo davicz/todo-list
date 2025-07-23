@@ -1,0 +1,36 @@
+# Arquivos e pastas do sistema operacional
+.DS_Store
+Thumbs.db
+
+# Pasta de dependências do Composer
+/backend/vendor/
+
+# Arquivo de ambiente com senhas e chaves. NUNCA comitar!
+/backend/.env
+
+# Arquivos de log do Laravel
+/backend/storage/logs/*.log
+!/backend/storage/logs/.gitignore
+
+# Arquivos de cache e sessão do Laravel
+/backend/storage/framework/sessions/*
+/backend/storage/framework/cache/data/*
+/backend/storage/framework/views/*
+!/backend/storage/framework/.gitignore
+
+# Pasta de armazenamento público do Laravel
+/backend/public/storage
+
+# Arquivos gerados pelo Laravel Sail (não estamos usando, mas é boa prática)
+/backend/docker-compose.yml
+/backend/.docker/
+/backend/start
+
+# Arquivos gerados pelo PHPUnit
+/backend/phpunit.result.cache
+
+# Pasta de dados do nosso banco de dados Docker
+/postgres_data/
+
+# Pasta de dependências do Node (para o futuro frontend Vue)
+/node_modules/
