@@ -1,61 +1,113 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# API To-Do List com Laravel
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+Esta é a API backend para a aplicação To-Do List, desenvolvida com o framework Laravel. A API fornece endpoints para autenticação de usuários, gerenciamento de cargos/permissões e operações CRUD (Criar, Ler, Atualizar, Deletar) para tarefas.
 
-## About Laravel
+## ✨ Funcionalidades
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+* **Autenticação Segura:** Sistema de registro e login baseado em tokens usando Laravel Sanctum.
+* **Gerenciamento de Cargos e Permissões:** Utiliza o pacote `spatie/laravel-permission` para diferenciar usuários `admin` e `user`.
+    * **Admins:** Podem gerenciar todas as tarefas do sistema e criar tarefas para qualquer usuário.
+    * **Users:** Podem visualizar, atualizar e deletar apenas suas próprias tarefas.
+* **CRUD Completo de Tarefas:** Endpoints para criar, listar, visualizar, atualizar e deletar tarefas.
+* **Ambiente Containerizado:** A aplicação é totalmente containerizada com Docker e Docker Compose para facilitar a configuração e a execução.
+* **Testes Automatizados:** Testes de funcionalidade para garantir a integridade das regras de negócio e autorização.
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+## 🚀 Tecnologias Utilizadas
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+* **Backend:** Laravel 11
+* **Banco de Dados:** PostgreSQL
+* **Autenticação:** Laravel Sanctum
+* **Autorização:** Spatie Laravel Permission
+* **Ambiente de Desenvolvimento:** Docker & Docker Compose
 
-## Learning Laravel
+## 📋 Pré-requisitos
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+Antes de começar, garanta que você tem as seguintes ferramentas instaladas na sua máquina:
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+* [Git](https://git-scm.com/)
+* [Docker](https://www.docker.com/products/docker-desktop/)
+* [Docker Compose](https://docs.docker.com/compose/install/)
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+## ⚙️ Instalação e Configuração
 
-## Laravel Sponsors
+Siga os passos abaixo para clonar e configurar o projeto em sua máquina local.
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+**1. Clone o Repositório**
+```bash
+git clone [https://github.com/davicz/todo-list.git](https://github.com/davicz/todo-list.git)
+cd todo-list
+```
 
-### Premium Partners
+**2. Configure o Arquivo de Ambiente**
+Copie o arquivo de ambiente de exemplo. Este arquivo contém todas as variáveis de configuração da aplicação.
+```bash
+cp .env.example .env
+```
+*Nenhuma alteração é necessária no arquivo `.env` para rodar com Docker, pois as credenciais do banco de dados já estão configuradas para se conectar ao contêiner.*
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+**3. Construa e Inicie os Contêineres**
+Este comando irá construir as imagens Docker e iniciar todos os serviços (aplicação, banco de dados, etc.) em segundo plano.
+```bash
+docker-compose up -d --build
+```
 
-## Contributing
+**4. Instale as Dependências do PHP**
+Execute o Composer dentro do contêiner para instalar as dependências do Laravel.
+```bash
+docker-compose exec app composer install
+```
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+**5. Gere a Chave da Aplicação**
+O Laravel precisa de uma chave de encriptação única para funcionar.
+```bash
+docker-compose exec app php artisan key:generate
+```
 
-## Code of Conduct
+**6. Execute as Migrations e os Seeders**
+Este comando final irá criar todas as tabelas no banco de dados e populá-las com os dados iniciais (cargos, permissões e usuários padrão).
+```bash
+docker-compose exec app php artisan migrate:fresh --seed
+```
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+🎉 **Pronto!** Sua API está rodando e acessível em `http://localhost:8000`.
 
-## Security Vulnerabilities
+## 🧪 Rodando os Testes
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+Para garantir que todas as funcionalidades críticas estão operando corretamente, você pode rodar a suíte de testes automatizados com o seguinte comando:
+```bash
+docker-compose exec app php artisan test
+```
 
-## License
+## 👤 Usuários Padrão
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+Os seeders criam dois usuários para facilitar os testes. As senhas para ambos são `password123`.
+
+| Cargo     | Email               | Senha         |
+| :-------- | :------------------ | :------------ |
+| **Admin** | `admin@exemplo.com` | `password123` |
+| **User**  | `user@exemplo.com`  | `password123` |
+
+## 📖 Endpoints da API
+
+A seguir está a documentação dos principais endpoints disponíveis.
+
+**Header Obrigatório para Rotas Protegidas:**
+`Authorization`: `Bearer <seu_token_de_acesso>`
+
+### Autenticação
+
+| Método | Endpoint      | Descrição                                  | Corpo (Body) da Requisição (JSON)                                                  |
+| :----- | :------------ | :----------------------------------------- | :--------------------------------------------------------------------------------- |
+| `POST` | `/api/register` | Registra um novo usuário (com cargo 'user'). | `{ "name": "...", "email": "...", "password": "...", "password_confirmation": "..." }` |
+| `POST` | `/api/login`    | Autentica um usuário e retorna um token.     | `{ "email": "...", "password": "..." }`                                              |
+| `POST` | `/api/logout`   | Invalida o token do usuário autenticado.   | *(Vazio)* |
+
+### Tarefas (Tasks)
+
+| Método   | Endpoint        | Descrição                                                                         | Corpo (Body) da Requisição (JSON)                                                                  | Permissão Necessária    |
+| :------- | :-------------- | :-------------------------------------------------------------------------------- | :------------------------------------------------------------------------------------------------- | :---------------------- |
+| `GET`    | `/api/tasks`      | Lista tarefas. Admins veem todas; usuários veem apenas as suas.                   | *(Vazio)* | Usuário Autenticado     |
+| `POST`   | `/api/tasks`      | Cria uma nova tarefa para um usuário específico.                                  | `{ "title": "...", "description": "...", "due_date": "YYYY-MM-DD", "user_id": ... }`               | **Admin** |
+| `GET`    | `/api/tasks/{id}` | Mostra os detalhes de uma tarefa específica.                                      | *(Vazio)* | Dono da Tarefa ou Admin |
+| `PUT`    | `/api/tasks/{id}` | Atualiza uma tarefa existente.                                                    | `{ "title": "...", "description": "...", "due_date": "...", "completed": true/false }` (campos opcionais) | Dono da Tarefa ou Admin |
+| `DELETE` | `/api/tasks/{id}` | Exclui uma tarefa.                                                                | *(Vazio)* | Dono da Tarefa ou Admin |
