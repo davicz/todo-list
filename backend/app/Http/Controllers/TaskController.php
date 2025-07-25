@@ -97,4 +97,42 @@ class TaskController extends Controller
 
         return response()->json(['message' => 'Task deleted successfully']);
     }
+        public function export(Request $request)
+    {
+        $user = $request->user();
+        
+        // Pega em TODAS as tarefas do utilizador (sem paginação) para exportar
+        $tasks = $user->hasRole('admin') ? Task::all() : $user->tasks;
+
+        $fileName = 'tarefas.csv';
+        $headers = [
+            "Content-type"        => "text/csv",
+            "Content-Disposition" => "attachment; filename=$fileName",
+            "Pragma"              => "no-cache",
+            "Cache-Control"       => "must-revalidate, post-check=0, pre-check=0",
+            "Expires"             => "0"
+        ];
+
+        $columns = ['ID', 'Título', 'Descrição', 'Data de Vencimento', 'Concluída', 'ID do Utilizador'];
+
+        $callback = function() use($tasks, $columns) {
+            $file = fopen('php://output', 'w');
+            fputcsv($file, $columns);
+
+            foreach ($tasks as $task) {
+                fputcsv($file, [
+                    $task->id,
+                    $task->title,
+                    $task->description,
+                    $task->due_date,
+                    $task->completed ? 'Sim' : 'Não',
+                    $task->user_id
+                ]);
+            }
+
+            fclose($file);
+        };
+
+        return response()->stream($callback, 200, $headers);
+    }
 }
