@@ -8,25 +8,43 @@ use Illuminate\Support\Facades\Auth;
 
 class TaskController extends Controller
 {
-    // Listar tarefas (Admins veem tudo, usuários veem apenas as suas)
+    /**
+     * Listar tarefas (Admins veem tudo, utilizadores veem apenas as suas).
+     * Agora com funcionalidade de busca.
+     */
     public function index(Request $request)
     {
         $user = $request->user();
-        if ($user->hasRole('admin')) {
-            return Task::with('user')->get(); // Admins veem tudo e quem é o dono
+        
+        // Inicia a query base: Admins podem ver tudo, utilizadores normais apenas as suas
+        $query = $user->hasRole('admin') ? Task::query()->with('user') : $user->tasks()->getQuery();
+
+        // Verifica se um termo de busca foi enviado na requisição (ex: /api/tasks?search=termo)
+        if ($request->has('search') && $request->input('search') != '') {
+            $searchTerm = $request->input('search');
+            
+            // Adiciona a condição de busca à query.
+            // Procura o termo tanto no 'title' QUANTO na 'description'.
+            $query->where(function ($subQuery) use ($searchTerm) {
+                $subQuery->where('title', 'like', "%{$searchTerm}%")
+                         ->orWhere('description', 'like', "%{$searchTerm}%");
+            });
         }
 
-        return $user->tasks; // Usuários normais veem apenas as suas
+        // Executa a query e retorna os resultados
+        return $query->get();
     }
 
-    // Criar uma nova tarefa (Apenas Admins)
+    /**
+     * Criar uma nova tarefa (Apenas Admins)
+     */
     public function store(Request $request)
     {
         $validatedData = $request->validate([
             'title' => 'required|string|max:255',
             'description' => 'nullable|string',
             'due_date' => 'nullable|date',
-            'user_id' => 'required|exists:users,id' // Valida que o usuário para quem a tarefa será criada existe
+            'user_id' => 'required|exists:users,id'
         ]);
 
         $task = Task::create($validatedData);
@@ -34,20 +52,22 @@ class TaskController extends Controller
         return response()->json($task, 201);
     }
 
-    // Mostrar uma tarefa específica
+    /**
+     * Mostrar uma tarefa específica
+     */
     public function show(Task $task)
     {
-        // Garante que o usuário só pode ver sua própria tarefa, a menos que seja admin
         if ($task->user_id !== Auth::id() && !Auth::user()->hasRole('admin')) {
             return response()->json(['message' => 'Unauthorized'], 403);
         }
         return $task;
     }
 
-    // Atualizar uma tarefa
+    /**
+     * Atualizar uma tarefa
+     */
     public function update(Request $request, Task $task)
     {
-        // Garante que o usuário só pode editar sua própria tarefa, a menos que seja admin
         if ($task->user_id !== Auth::id() && !Auth::user()->hasRole('admin')) {
             return response()->json(['message' => 'Unauthorized'], 403);
         }
@@ -64,11 +84,12 @@ class TaskController extends Controller
         return response()->json($task);
     }
 
-    // Deletar uma tarefa
-    public function destroy(Request $request, Task $task)
+    /**
+     * Apagar uma tarefa
+     */
+    public function destroy(Task $task)
     {
-        // Garante que o usuário só pode deletar sua própria tarefa, a menos que seja admin
-        if ($task->user_id !== Auth::id() && !$request->user()->hasRole('admin')) {
+        if ($task->user_id !== Auth::id() && !Auth::user()->hasRole('admin')) {
             return response()->json(['message' => 'Unauthorized'], 403);
         }
 
