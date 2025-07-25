@@ -51,8 +51,9 @@ class AuthController extends Controller
             ], 401);
         }
 
-        // Forma Otimizada de pegar o usuário já autenticado
         $user = $request->user(); 
+
+        $user->load('roles');
 
         $token = $user->createToken('auth_token')->plainTextToken;
 
