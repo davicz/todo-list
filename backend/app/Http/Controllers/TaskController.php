@@ -43,7 +43,7 @@ class TaskController extends Controller
         $validatedData = $request->validate([
             'title' => 'required|string|max:255',
             'description' => 'nullable|string',
-            'due_date' => 'nullable|date',
+            'due_date' => 'nullable|date|after:today',
             'user_id' => 'required|exists:users,id'
         ]);
 
@@ -75,7 +75,7 @@ class TaskController extends Controller
         $validatedData = $request->validate([
             'title' => 'sometimes|string|max:255',
             'description' => 'nullable|string',
-            'due_date' => 'nullable|date',
+            'due_date' => 'nullable|date|after:today',
             'completed' => 'sometimes|boolean'
         ]);
 
