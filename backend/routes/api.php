@@ -4,6 +4,7 @@
     use Illuminate\Support\Facades\Route;
     use App\Http\Controllers\AuthController;
     use App\Http\Controllers\TaskController;
+    use App\Http\Controllers\Api\UserController;
 
     Route::post('/register', [AuthController::class, 'register']);
     Route::post('/login', [AuthController::class, 'login']);
@@ -17,4 +18,9 @@
         Route::get('/tasks/{task}', [TaskController::class, 'show']);
         Route::put('/tasks/{task}', [TaskController::class, 'update']);
         Route::delete('/tasks/{task}', [TaskController::class, 'destroy']);
+    
+        Route::prefix('admin')->middleware('role:admin')->group(function () {
+            Route::apiResource('users', UserController::class)->only(['index', 'update', 'destroy']);
+    });
+    
     });
